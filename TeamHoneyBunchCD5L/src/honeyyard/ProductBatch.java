@@ -49,7 +49,16 @@ public class ProductBatch {
     /* method: deduct (for later in transcations)
      * removes sold items from this batch's quantity as well as inventory
     */
-    
+    public void deductStock(int quantity) {
+		// checkers for validity
+		if (quantity <= 0) {
+			throw new IllegalArgumentException("Quantity must be greater than 0!");
+		}
+		if (quantity > remainingQuantity) {
+			throw new IllegalArgumentException("Not enough stock in batch.");
+		}
+		remainingQuantity -= quantity;
+	}
     /* method: is empty
      * returns true if there's nothing left in this batch
      * used by inventory to skip empty batches in the expired / near expiry lists
