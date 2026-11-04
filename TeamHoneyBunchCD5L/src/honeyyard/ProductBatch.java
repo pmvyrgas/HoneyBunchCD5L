@@ -60,11 +60,39 @@ public class ProductBatch {
      * if expired, return true
      * if product has no expiration date / not expired, false
     */
+	boolean isExpired(){
+		// no expiration date
+		if(expirationDate == null){
+			return false;
+		}
+		if(expirationDate.isBefore(LocalDate.now())){
+			return true; // the expiration date has already passed
+		}
+		return false; // not expired
+	}
     
     /* method: is near expiry
      * if expired or no expiration, return false
      * if product is not expired yet but will be in a given number of days (nilagay ko sa inventory class ung pagset), true
     */
+	boolean isNearExpiry(int days){
+		// no expiration date, never expires
+		if(expirationDate == null){
+			return false;
+		}
+
+		if(isExpired()){
+            return false; // already expired
+		}
+		
+		// add the given number of days to today's date to get the cutoff for near expiry
+		LocalDate limit = LocalDate.now().plusDays(days); 
+		if(expirationDate.isAfter(limit)) {
+            return false; // if date is still beyond limit, not yet near expiry
+        }
+		
+		return true; // expires on or before the limit
+	}
     
     // temporary printing before GUI
     @Override
