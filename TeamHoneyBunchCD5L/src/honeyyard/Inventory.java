@@ -51,24 +51,70 @@ public class Inventory {
      * changes only the product name
      * new name is checked the same way as in add product
      */
-
+	public boolean updateName (String productID, String newName) {
+		Product product = findProduct(productID); // find product first
+		// checker for validity
+		if (product == null) {
+			return false;
+		}
+		if (newName == null || newName.trim().isEmpty()){ // if the new name is invalid
+			throw new IllegalArgumentException("Product name cannot be empty!");
+		}
+		//set new name
+		product.setName(newName.trim());
+		return true; // successfully updated name
+	}
 	/* method: update category
      * changes only the product category
      * new category is checked the same way as in add product
      */
-
+	public boolean updateCategory(String productID, String newCategory) {
+		Product product = findProduct(productID); // find product first
+		// checker for validity
+		if (product == null) {
+			return false;
+		}
+		if (newCategory == null || newCategory.trim().isEmpty()){ // if the new category is invalid
+			throw new IllegalArgumentException("Product category cannot be empty!");
+		}
+		//set new category
+		product.setCategory(newCategory.trim());
+		return true; // successfully updated category
+	}
 	/* method: update description
      * changes only the description
      */
+	public boolean updateDescription (String productID, String newDescription) {
+		Product product = findProduct(productID); // find product first
+		// checker for validity
+		if (product == null) {
+			return false;
+		}
+		if (newDescription == null || newDescription.trim().isEmpty()){ // if the new description is invalid
+			throw new IllegalArgumentException("Product description cannot be empty!");
+		}
+		//set new description
+		product.setDescription(newDescription.trim());
+		return true; // successfully updated description
+	}
 
 	/* method: update price
      * changes only the selling price
      * new price is checked the same way as in add product
      */
-	
-	/* method: update description
-     * changes only the description
-     */
+	public boolean updatePrice(String productID, double newPrice) {
+		Product product = findProduct(productID); // find product first
+		// checker for validity
+		if (product == null) {
+			return false;
+		}
+		if (newPrice <= 0){ // new price must be greater than 0
+			throw new IllegalArgumentException("Selling price must be greater than 0.");
+		}
+		//set new selling price of product
+		product.setSellingPrice(newPrice);
+		return true; // successfully updated price
+	}
 	
 	/////////////////
 
