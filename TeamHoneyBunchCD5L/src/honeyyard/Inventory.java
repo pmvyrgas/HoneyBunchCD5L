@@ -23,15 +23,24 @@ public class Inventory {
      * returns the product with this id, or null if there is none
      * used by the other methods to check if a product exists before adding, updating, or restocking
      */
-	
+	private Product findProduct(String productID) {
+		for (Product product: products) {
+			if (product.getProductId().equalsIgnoreCase(productID)) {
+				return product;
+			}
+		}
+		return null;
+	}
 	/* method: add product
      * checks the values, then makes the new product and adds it to the list
      * throws an error with a message if something is wrong (blank fields, price, duplicate id)
      */
+
 	
 	/* method: search products (for users)
      * returns all products whose name or id has the keyword in it, must not be case sensitive
      */
+
 	
 	/* method: get products by category
      * returns all products in this category, for filtering
