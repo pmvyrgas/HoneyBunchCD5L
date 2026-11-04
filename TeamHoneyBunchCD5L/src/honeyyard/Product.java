@@ -55,6 +55,13 @@ public class Product {
 	 }
 	 
 	 // method: display all product info
+	void displayInfo(){
+	     System.out.println("Product ID:  " + productId);
+	     System.out.println("Name:	" + productName);
+	     System.out.println("Category:	" + productCategory);
+	     System.out.println("Description:	" + productDescription);
+	     System.out.println("Price:	PHP " + sellingPrice);
+	 }
 	 
 	 // temporary printing format
 	 public String toString() {
