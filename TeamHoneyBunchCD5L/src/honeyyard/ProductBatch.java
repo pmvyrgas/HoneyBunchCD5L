@@ -54,16 +54,22 @@ public class ProductBatch {
 		if (quantity <= 0) {
 			throw new IllegalArgumentException("Quantity must be greater than 0!");
 		}
-		if (quantity > remainingQuantity) {
+		if (quantity > remainingQuantity) { // insufficient stock
 			throw new IllegalArgumentException("Not enough stock in batch.");
 		}
-		remainingQuantity -= quantity;
+		remainingQuantity -= quantity; // deduct stock
 	}
     /* method: is empty
      * returns true if there's nothing left in this batch
      * used by inventory to skip empty batches in the expired / near expiry lists
     */
-
+	boolean isEmpty(){
+		// check if there's nothing left
+		if (remainingQuantity == 0) {
+			return true; // empty
+		}
+		return false; // not empty
+	}
     
     /* method: is expired
      * if expired, return true
