@@ -35,16 +35,66 @@ public class Inventory {
      * checks the values, then makes the new product and adds it to the list
      * throws an error with a message if something is wrong (blank fields, price, duplicate id)
      */
+	public void addProduct(Manager currentUser, Product newProduct)  { 
+		if(currentUser == null || !currentUser.isAuthorized()) { //since only the manager is allowed to add products
+			throw new SecurityException("Only managers can add new products. ");
+		}
+		
+		//checks for blanks
+		if(newProduct.getProductId() == null || newProduct.getProductId().trim().isEmpty() ||
+		        newProduct.getName() == null || newProduct.getName().trim().isEmpty() ||
+		        newProduct.getCategory() == null || newProduct.getCategory().trim().isEmpty() ||
+		        newProduct.getDescription() == null || newProduct.getDescription().trim().isEmpty() ) {
+			throw new IllegalArgumentException("All fields should be filled.");
+		}
+		//checks for the duplicates
+		for(Product p : products) {
+			if(p.getProductId().equalsIgnoreCase(newProduct.getProductId())) {
+				throw new IllegalArgumentException("Product already exists. ");
+			}
+		}
+		
+		products.add(newProduct); //adds the product to the list if their is no error
+	} 
 
 	
 	/* method: search products (for users)
      * returns all products whose name or id has the keyword in it, must not be case sensitive
      */
+	public ArrayList<Product> searchProductsForUsers(String keyword ) {
+		ArrayList<Product> matchingProducts = new ArrayList<Product>(); //temporary list to store the possible products
+		
+		if(keyword == null || keyword.trim().isEmpty()) {
+			return matchingProducts; //returns empty if the search keyword is empty
+		}
+		
+		String searchTerm = keyword.toLowerCase().trim();
+		
+		for(Product p: products) {
+			if(p.getProductId().toLowerCase().contains(searchTerm) || p.getName().toLowerCase().contains(searchTerm)) { //since this is not case sensitive
+				matchingProducts.add(p); //adds all the possible products in a temporary arraylist
+			}
+		}
+		
+		return matchingProducts; //returns all possible matching products
+	}
 
 	
 	/* method: get products by category
      * returns all products in this category, for filtering
      */
+	public ArrayList<Product> getProductsByCategory(String category){
+	ArrayList<Product> categoryList = new ArrayList<Product>(); //temporary list to store the possible products
+			if(category == null || category.trim().isEmpty()) {
+				return categoryList; //returns empty if the search keyword is empty
+			}
+			for(Product p: products) {
+				if(p.getCategory().toLowerCase().equalsIgnoreCase(category.trim())) { //since this is not case sensitive
+					categoryList.add(p); //adds all the possible products in a temporary arraylist
+				}
+			}
+		return categoryList; //returns all possible matching products
+	}
 	
 	//// idk pa if hiwalay ko sila na method or 1 for all
 	/* method: update name
