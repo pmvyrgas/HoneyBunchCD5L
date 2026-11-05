@@ -202,6 +202,56 @@ public class Inventory {
 		ProductBatch newBatch = new ProductBatch(batchId, productID, quantity, expiryDate);
 		batches.add(newBatch);
 	}
+
+	/* method: deduct stock (for later in transactions)
+     * removes sold items from the product's batches, oldest expiration first
+     */
+	public void deductStock(String productID, int quantityToDeduct) {
+		if (quantityToDeduct <= 0) {
+			throw new IllegalArgumentException("Quantity to deduct must be greater than 0.");
+		}
+		
+		int availableStock = getTotalStock(productID);
+		if (availableStock < quantityToDeduct) {
+			throw new IllegalArgumentException("Insufficient non-expired stock for product: " + productID);
+		}
+
+		ArrayList<ProductBatch> productBatches = getBatchesOfProduct(productID);
+		LocalDate today = LocalDate.now();
+
+		// remove expired batches from consideration for sale
+		productBatches.removeIf(b -> b.getExpiryDate() != null && b.getExpiryDate().isBefore(today));
+
+		// sort by expiry date oldest first (null expiry dates placed last)
+		productBatches.sort((b1, b2) -> {
+			if (b1.getExpiryDate() == null) {
+				return 1;
+			}
+			if (b2.getExpiryDate() == null) {
+				return -1;
+			}
+			return b1.getExpiryDate().compareTo(b2.getExpiryDate());
+		});
+
+		int remainingToDeduct = quantityToDeduct;
+		for (ProductBatch b : productBatches) {
+			if (remainingToDessi <= 0 && remainingToDeduct <= 0) {
+				break; // safety guard
+			}
+			if (remainingToDeduct <= 0) {
+				break;
+			}
+
+			int currentQty = b.getQuantity();
+			if (currentQty <= remainingToDeduct) {
+				remainingToDeduct -= currentQty;
+				b.setQuantity(0);
+			} else {
+				b.setQuantity(currentQty - remainingToDeduct);
+				remainingToDeduct = 0;
+			}
+		}
+	}
 	
 	/////////////////
 	
@@ -213,9 +263,6 @@ public class Inventory {
      * adds up the remaining quantity of all the product's batches that are not expired
      */
 	
-	/* method: deduct stock (for later in transactions)
-     * removes sold items from the product's batches, oldest expiration first
-     */
 	
 	/* method: get low stock products
      * products with stock more than 0 but at or below low stock limit
