@@ -47,6 +47,12 @@ public class Inventory {
 		        newProduct.getDescription() == null || newProduct.getDescription().trim().isEmpty() ) {
 			throw new IllegalArgumentException("All fields should be filled.");
 		}
+
+		// checks the price
+        if (newProduct.getSellingPrice() <= 0){
+            throw new IllegalArgumentException("Selling price must be greater than 0.");
+		}
+		
 		//checks for the duplicates
 		for(Product p : products) {
 			if(p.getProductId().equalsIgnoreCase(newProduct.getProductId())) {
