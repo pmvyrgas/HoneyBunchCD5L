@@ -3,7 +3,6 @@ package honeyyard;
 import java.time.LocalDate;
 
 public class ProductBatch {
-	public static int nextBatchNumber = 1;
     // attributes
     private String batchId;
     private String productId;
