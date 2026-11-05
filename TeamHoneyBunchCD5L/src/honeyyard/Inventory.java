@@ -177,19 +177,18 @@ public class Inventory {
      * batch id is the product id + 4 digits starting from 0001 (ex. HNY01-0001)
      * expiration date can be null for products that don't expire
      */
-	public void addBatch(Manager currentUser, String productID, int quantity, LocalDate expirationDate) {
+	public void addBatch(Manager currentUser, String productID, int quantityReceived, LocalDate deliveryDate, LocalDate expirationDate) {
 		if (currentUser == null || !currentUser.isAuthorized()) {
 			throw new SecurityException("Only managers can add new batches.");
 		}
-		
 		Product product = findProduct(productID);
 		if (product == null) {
 			throw new IllegalArgumentException("Product with ID " + productID + " does not exist.");
 		}
-		if (quantity <= 0) {
-			throw new IllegalArgumentException("Batch quantity must be greater than 0.");
+		if (quantityReceived <= 0) {
+			throw new IllegalArgumentException("Batch quantity received must be greater than 0.");
 		}
-		
+
 		// count existing batches for this product to generate sequential 4-digit ID
 		int count = 0;
 		for (ProductBatch b : batches) {
@@ -197,9 +196,8 @@ public class Inventory {
 				count++;
 			}
 		}
-	
 		String batchId = String.format("%s-%04d", productID, count + 1);
-		ProductBatch newBatch = new ProductBatch(batchId, productID, quantity, expirationDate);
+		ProductBatch newBatch = new ProductBatch(batchId, productID, quantityReceived, deliveryDate, expirationDate);
 		batches.add(newBatch);
 	}
 
@@ -210,44 +208,39 @@ public class Inventory {
 		if (quantityToDeduct <= 0) {
 			throw new IllegalArgumentException("Quantity to deduct must be greater than 0.");
 		}
-		
 		int availableStock = getTotalStock(productID);
 		if (availableStock < quantityToDeduct) {
 			throw new IllegalArgumentException("Insufficient non-expired stock for product: " + productID);
 		}
 
 		ArrayList<ProductBatch> productBatches = getBatchesOfProduct(productID);
-		LocalDate today = LocalDate.now();
 
-		// remove expired batches from consideration for sale
-		productBatches.removeIf(b -> b.getExpiryDate() != null && b.getExpiryDate().isBefore(today));
+		// remove expired or empty batches from consideration for sale
+		productBatches.removeIf(b -> b.isExpired() || b.isEmpty());
 
-		// sort by expiry date oldest first (null expiry dates placed last)
+		// sort by expiration date oldest first (null expiration dates placed last)
 		productBatches.sort((b1, b2) -> {
-			if (b1.getExpiryDate() == null) {
+			if (b1.getExpirationDate() == null) {
 				return 1;
 			}
-			if (b2.getExpiryDate() == null) {
+			if (b2.getExpirationDate() == null) {
 				return -1;
 			}
-			return b1.getExpiryDate().compareTo(b2.getExpiryDate());
+			return b1.getExpirationDate().compareTo(b2.getExpirationDate());
 		});
 
 		int remainingToDeduct = quantityToDeduct;
 		for (ProductBatch b : productBatches) {
-			if (remainingToDessi <= 0 && remainingToDeduct <= 0) {
-				break; // safety guard
-			}
 			if (remainingToDeduct <= 0) {
 				break;
 			}
 
-			int currentQty = b.getQuantity();
+			int currentQty = b.getRemainingQuantity();
 			if (currentQty <= remainingToDeduct) {
 				remainingToDeduct -= currentQty;
-				b.setQuantity(0);
+				b.deductStock(currentQty);
 			} else {
-				b.setQuantity(currentQty - remainingToDeduct);
+				b.deductStock(remainingToDeduct);
 				remainingToDeduct = 0;
 			}
 		}
