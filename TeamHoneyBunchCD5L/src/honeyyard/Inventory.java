@@ -177,7 +177,7 @@ public class Inventory {
      * batch id is the product id + 4 digits starting from 0001 (ex. HNY01-0001)
      * expiration date can be null for products that don't expire
      */
-	public void addBatch(Manager currentUser, String productID, int quantity, LocalDate expiryDate) {
+	public void addBatch(Manager currentUser, String productID, int quantity, LocalDate expirationDate) {
 		if (currentUser == null || !currentUser.isAuthorized()) {
 			throw new SecurityException("Only managers can add new batches.");
 		}
@@ -199,7 +199,7 @@ public class Inventory {
 		}
 	
 		String batchId = String.format("%s-%04d", productID, count + 1);
-		ProductBatch newBatch = new ProductBatch(batchId, productID, quantity, expiryDate);
+		ProductBatch newBatch = new ProductBatch(batchId, productID, quantity, expirationDate);
 		batches.add(newBatch);
 	}
 
