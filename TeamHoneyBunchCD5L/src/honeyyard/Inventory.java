@@ -251,20 +251,82 @@ public class Inventory {
 	/* method: get batches of product
      * returns all the batches of one product
      */
+	public ArrayList<ProductBatch> getBatchesOfProduct(String name){
+		ArrayList<ProductBatch> productBatchList = new ArrayList<ProductBatch>();
+		
+		if(name == null || name.trim().isEmpty()) {
+			return productBatchList;
+		}
+		
+		String targetId= null;
+		for(Product p: products) {
+			if(p.getName().equalsIgnoreCase(name.trim())) {
+				targetId = p.getProductId();
+				break;
+			}
+		}
+		if(targetId == null) { // verify if product exists in inventory first
+			return productBatchList;
+		}
+		
+		for(ProductBatch b: batches) {  //collects batches matching that product ID
+			if(b.getProductId().equalsIgnoreCase(targetId)) {
+				productBatchList.add(b);
+			}
+		}
+		
+		return productBatchList;
+	}
 	
 	/* method: get total stock
      * adds up the remaining quantity of all the product's batches that are not expired
      */
+	public int getTotalStock(String productId) {
+		int total = 0;
+		if(productId == null || productId.trim().isEmpty()) {
+			return 0;
+		}
+		
+		ArrayList<ProductBatch> productBatches = getBatchesOfProduct(productId);
+		for(ProductBatch b: productBatches) {
+			if(!b.isExpired()) { //checks if not expired
+				total += b.getRemainingQuantity();
+			}
+		}
+		return total;
+	}
 	
 	
 	/* method: get low stock products
      * products with stock more than 0 but at or below low stock limit
      * tells the manager what to restock soon
      */
+	public ArrayList<Product> getLowStockProducts(String productId){
+		ArrayList<Product> lowStockList = new ArrayList<Product>();
+		
+		for(Product p : products) {
+			int totalStock = getTotalStock(p.getProductId());
+			if(totalStock> 0 && totalStock <= lowStockLimit) { //adds to list when greater than 0 but is lower than or equal the limit
+				lowStockList.add(p);
+			}
+		}
+		return lowStockList;
+	}
 	
 	 /* method: get out of stock products
      * products with 0 stock, need restocking right away 
      */
+	public ArrayList<Product> getOutOfStockProducts(String productId){
+		ArrayList<Product> outOfStockList = new ArrayList<Product>();
+		
+		for(Product p : products) {
+			int totalStock = getTotalStock(p.getProductId());
+			if(totalStock == 0) { //adds to list when total is 0
+				outOfStockList.add(p);
+			}
+		}
+		return outOfStockList;
+	}
 	
 	/* method: get expired batches
      * batches that are expired but still have items left, should be removed from the shelf and not sold
