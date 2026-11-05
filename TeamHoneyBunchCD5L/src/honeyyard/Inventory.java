@@ -251,16 +251,18 @@ public class Inventory {
 	/* method: get batches of product
      * returns all the batches of one product
      */
-	public ArrayList<ProductBatch> getBatchesOfProduct(String name){
+	// note: hi! since product id talaga yung mas ideal na parameter for methods, i changed the name to product id
+	// also since minamatch sya sa targetID, hindi magwwork kung name yung parameter
+	public ArrayList<ProductBatch> getBatchesOfProduct(String productID){
 		ArrayList<ProductBatch> productBatchList = new ArrayList<ProductBatch>();
 		
-		if(name == null || name.trim().isEmpty()) {
+		if(productID == null || productID.trim().isEmpty()) {
 			return productBatchList;
 		}
 		
 		String targetId= null;
 		for(Product p: products) {
-			if(p.getName().equalsIgnoreCase(name.trim())) {
+			if(p.getName().equalsIgnoreCase(productID.trim())) {
 				targetId = p.getProductId();
 				break;
 			}
