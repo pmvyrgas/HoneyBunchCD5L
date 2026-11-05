@@ -171,15 +171,39 @@ public class Inventory {
 		product.setSellingPrice(newPrice);
 		return true; // successfully updated price
 	}
-	
-	/////////////////
 
-	
 	/* method: add batch
      * checks the values, generates the batch id, then makes and adds the new batch
      * batch id is the product id + 4 digits starting from 0001 (ex. HNY01-0001)
      * expiration date can be null for products that don't expire
      */
+	public void addBatch(Manager currentUser, String productID, int quantity, LocalDate expiryDate) {
+		if (currentUser == null || !currentUser.isAuthorized()) {
+			throw new SecurityException("Only managers can add new batches.");
+		}
+		
+		Product product = findProduct(productID);
+		if (product == null) {
+			throw new IllegalArgumentException("Product with ID " + productID + " does not exist.");
+		}
+		if (quantity <= 0) {
+			throw new IllegalArgumentException("Batch quantity must be greater than 0.");
+		}
+		
+		// count existing batches for this product to generate sequential 4-digit ID
+		int count = 0;
+		for (ProductBatch b : batches) {
+			if (b.getProductId().equalsIgnoreCase(productID)) {
+				count++;
+			}
+		}
+	
+		String batchId = String.format("%s-%04d", productID, count + 1);
+		ProductBatch newBatch = new ProductBatch(batchId, productID, quantity, expiryDate);
+		batches.add(newBatch);
+	}
+	
+	/////////////////
 	
 	/* method: get batches of product
      * returns all the batches of one product
