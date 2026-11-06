@@ -415,12 +415,28 @@ public class Inventory {
 	 /* method: get all batches
      * returns the whole batch list (all delivery records for later)
      */
+	public ArrayList<ProductBatch> getAllBatches() {
+	    return this.batches;
+	}
 	
 	 /* method: displayBatches
      * prints all batches, one per line (temporary, before GUI)
      */
+	public void displayBatches() {
+	    ArrayList<ProductBatch> batchList = getAllBatches();
+	    
+	    if (batchList == null || batchList.isEmpty()) {
+	        System.out.println("No product batches available in the inventory.");
+	        return;
+	    }
+	    
+	    System.out.println("======= PRODUCT BATCHES =======");
+	    for (ProductBatch batch : batchList) {
+	        System.out.println(batch.toString());
+	        System.out.println("----------------------------------------");
+	    }
+	}
 
-	
 	/* method: save data
      * saves all products and batches into the file, an existing file is replaced
      * call this before the program closes
