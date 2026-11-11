@@ -1,6 +1,6 @@
 package honeyyard;
 
-// clerk has limted access to
+// clerk has limted access 
 // needs to enter their pin before every clerk action
 public class Clerk extends User {
 	private static final long serialVersionUID = 1L;
@@ -27,7 +27,8 @@ public class Clerk extends User {
 		return pin.equals(enteredPin);
 	}
 
-  public Transaction startNewTransaction(String transactionID ){
-    Transaction = new Transaction();
+  public Transaction startNewTransaction(ArrayList<TransactionItem> items){
+    Transaction newTransaction = new Transaction(this.getUsername(), items); //instatiates new transaction
+	return newTransaction;
   }
 }
