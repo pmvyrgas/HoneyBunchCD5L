@@ -22,7 +22,40 @@ public class Transaction implements Serializable {
     this.transactionId = UUID.randomUUID().toString();
     this.transactionDate = LocalDateTime.now();
     this.voided = false;
-    
+    calculateTotal();
   }
+  //METHODS
+  //to calculate the total amount of items purchased
+  private void calculateTotal() {
+    totalAmount = 0; //initially 0
+    for (TransactionItem item: items) {
+      totalAmount += item.getSubtotal();
+    }
+  }
+  //returns he transaction ID
+  public String getTransactionId() {
+    return this.transactionId;
+  }
+  //returns the username of the Clerk
+  public String getClerkUsername() {
+    return this.clerkUsername;
+  }
+  //returns date and time of transaction
+  public LocalDateTime getTransactionDate() {
+    return this.transactionDate;
+  }
+  //returns the total amount for/of the transaction
+  public double getTotalAmount() {
+    return this.totalAmount;
+  }
+  //checker if transaction is voided
+  public boolean isVoided() {
+    return this.voided;
+  }
+  // //to return the purchased items
+  // public ArrayList<TransactionItem> getItems() {
+  //   return new ArrayList<TransactionItem>(items);
+  // } 
 
+  //addItem here?
 }
