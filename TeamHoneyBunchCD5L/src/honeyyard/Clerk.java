@@ -27,8 +27,19 @@ public class Clerk extends User {
 		return pin.equals(enteredPin);
 	}
 
-  public Transaction startNewTransaction(ArrayList<TransactionItem> items){
+    public Transaction startNewTransaction(ArrayList<TransactionItem> items){
     Transaction newTransaction = new Transaction(this.getUsername(), items); //instatiates new transaction
 	return newTransaction;
   }
+
+/////////// 
+	
+// methods: startNewPurchase
+//  initiates a new cart/transaction session
+
+// methods: processCheckout
+// enters the received payment amount to complete the checkout process
+
+// methods: authorizeVoid
+// authorizes the voiding of a previously recorded transactio
 }
