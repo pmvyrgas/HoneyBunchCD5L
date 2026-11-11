@@ -33,6 +33,6 @@ public class TransactionItem implements Serializable {
   public double getSubtotal() {
     return quantity*unitPrice;
   }
-  
+  //method for batch deductions? like quantity deducted from a batch? need kaya separate class?
   
 }
