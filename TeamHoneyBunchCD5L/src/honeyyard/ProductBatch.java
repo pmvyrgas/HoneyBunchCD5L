@@ -36,6 +36,9 @@ public class ProductBatch implements Serializable {
 		this.remainingQuantity = quantityReceived; // starts full, goes down when sold
 		this.deliveryDate = deliveryDate;
 		this.expirationDate = expirationDate;
+		//added batchId and productId
+		this.batchId = batchId.trim();
+		this.productId = productId.trim();
     }
 	
     // getters
