@@ -33,6 +33,16 @@ public class TransactionItem implements Serializable {
   public double getSubtotal() {
     return quantity*unitPrice;
   }
+
+  /////////
   //method for batch deductions? like quantity deducted from a batch? need kaya separate class?
+
+  // method: getTransactionItemDetails
+  // holds and retrieves the product, purchased quantity, 
+  // and selling price at the time of purchase
+  
+  // methods: calculateSubtotal
+  // computes the subtotal amount for the transaction item 
+  // based on quantity and selling price
   
 }
