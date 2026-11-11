@@ -57,5 +57,36 @@ public class Transaction implements Serializable {
   //   return new ArrayList<TransactionItem>(items);
   // } 
 
-  //addItem here?
+  ///////////
+
+  // methods: createTransaction
+  // initializes a new transaction cart with a unique transaction id, 
+  // the logged-in clerk's username, an empty arraylist of transaction items,
+  // and a pending status
+  
+  // methods: addItem
+  // adds a selected product and its quantity to the cart as a transaction item
+  // (or increases the quantity if the product ID already exists in the cart)
+  
+  // methods: updateItemQuantity
+  // changes the quantity of a specific item in the pending cart
+  
+  // methods: removeItem
+  // removes an item from the cart
+  
+  // methods: recalculateTotal
+  // recalculates the overall transaction amount using 
+  // the subtotals of all transaction items
+  
+  // methods: proceedCheckout
+  // validates that the cart is not empty, payment is sufficient, 
+  // and the transaction is pending before passing it for processing
+  
+  // methods: markCompleted
+  // marks the transaction as completed, finalizes the paid amount and change, 
+  // and logs it to transaction records and the cash wallet
+  
+  // methods: voidTransaction
+  // updates the transaction status to voided
+  // and triggers a corresponding refund to the cash wallet
 }
