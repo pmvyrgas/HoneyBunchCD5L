@@ -1,0 +1,33 @@
+package honeyyard;
+
+// clerk has limted access to
+// needs to enter their pin before every clerk action
+public class Clerk extends User {
+	private static final long serialVersionUID = 1L;
+	// attributes
+	private String pin;
+	
+	public Clerk(String username, String password, String pin) {
+		super(username, password);
+		// pin must be exactly 6 digits
+		if (pin == null || !pin.matches("[0-9]{6}")){
+			throw new IllegalArgumentException("PIN must be 6 digits.");
+		}
+		this.pin = pin;
+	}
+
+	/* method: is authorized
+	 * returns true only if the entered pin matches this clerk's pin
+	 */
+	@Override
+	public boolean isAuthorized(String enteredPin) {
+		if (enteredPin == null){
+			return false;
+		}
+		return pin.equals(enteredPin);
+	}
+
+  public Transaction startNewTransaction(String transactionID ){
+    Transaction = new Transaction();
+  }
+}
