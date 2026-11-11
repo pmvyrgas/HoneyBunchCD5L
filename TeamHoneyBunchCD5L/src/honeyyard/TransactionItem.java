@@ -16,6 +16,23 @@ public class TransactionItem implements Serializable {
     this.quantity = quantity;
     this.unitPrice = product.getSellingPrice();
   }
-
+  //METHODS
+  //this returns the product included in the transaction
+  public Product getProduct() {
+    return this.product;
+  }
+  //returns the quantity purchased
+  public int getQuantity() {
+    return this.quantity;
+  }
+  //returns the price of product when transaction was made
+  public double getUnitPrice() {
+    return this.unitPrice;
+  }
+  //this calculates the subtotal for the item in the transaction
+  public double getSubtotal() {
+    return quantity*unitPrice;
+  }
+  
   
 }
