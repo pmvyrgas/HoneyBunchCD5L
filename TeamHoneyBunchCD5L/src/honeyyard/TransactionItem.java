@@ -11,28 +11,28 @@ public class TransactionItem implements Serializable {
   
   //CONSTRUCTOR
   public TransactionItem(Product product, int quantity) {
-    if (product == null) { //check invalid product 
-        throw new IllegalArgumentException("Product cannot be empty.");
-    }
-    if (quantity <= 0) { //check invalid quantity 
-        throw new IllegalArgumentException("Quantity must be greater than 0.");
-    }
-    this.product = product;
-    this.quantity = quantity;
-    this.unitPrice = product.getSellingPrice();
+	  if (product == null) { //check invalid product 
+		  throw new IllegalArgumentException("Product cannot be empty.");
+	  }
+      if (quantity <= 0) { //check invalid quantity 
+          throw new IllegalArgumentException("Quantity must be greater than 0.");
+      }
+      this.product = product;
+      this.quantity = quantity;
+      this.unitPrice = product.getSellingPrice();
   }
   //METHODS
   //this returns the product included in the transaction
   public Product getProduct() {
-    return this.product;
+	  return this.product;
   }
   //returns the quantity purchased
   public int getQuantity() {
-    return this.quantity;
+	  return this.quantity;
   }
   //returns the price of product when transaction was made
   public double getUnitPrice() {
-    return this.unitPrice;
+	  return this.unitPrice;
   }
 
   /////////
@@ -46,7 +46,7 @@ public class TransactionItem implements Serializable {
   // computes the subtotal amount for the transaction item 
   // based on quantity and selling price
   public double calculateSubtotal() {
-	    return quantity*unitPrice;
+	  return quantity*unitPrice;
   }
   
   //added method: setQuantity (setter)
