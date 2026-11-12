@@ -11,6 +11,12 @@ public class TransactionItem implements Serializable {
   
   //CONSTRUCTOR
   public TransactionItem(Product product, int quantity) {
+    if (product == null) { //check invalid product 
+        throw new IllegalArgumentException("Product cannot be empty.");
+    }
+    if (quantity <= 0) { //check invalid quantity 
+        throw new IllegalArgumentException("Quantity must be greater than 0.");
+    }
     this.product = product;
     this.quantity = quantity;
     this.unitPrice = product.getSellingPrice();
@@ -42,5 +48,20 @@ public class TransactionItem implements Serializable {
   public double calculateSubtotal() {
 	    return quantity*unitPrice;
   }
-  // need ba natin ng toString method here? for the subtotal?
+  
+  //added method: setQuantity (setter)
+  //updates the purchased quantity
+  public void setQuantity(int quantity) {
+      if (quantity <= 0) { //checker for invalid quantity
+          throw new IllegalArgumentException("Quantity must be greater than 0.");
+      }
+      this.quantity = quantity;
+  }
+  
+  //added method: override the toString (temporary print statement)
+  //displays transaction item details and subtotal
+  @Override
+  public String toString() {
+      return getTransactionItemDetails() + "\nSubtotal: PHP " + String.format("%.2f", calculateSubtotal());
+  }
 }
