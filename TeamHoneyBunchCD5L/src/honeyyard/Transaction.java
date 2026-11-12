@@ -7,77 +7,155 @@ import java.util.UUID; //Universally Unique Identifier - for unique IDs in each 
 
 public class Transaction implements Serializable {
   private static final long serialVersionUID = 1L;
+  //CONSTANTS -- added for status
+  public static final String PENDING = "PENDING";
+  public static final String COMPLETED = "COMPLETED";
+  public static final String VOIDED = "VOIDED";
   //ATTRIBUTES
   private String transactionId;
   private String clerkUsername;
   private ArrayList<TransactionItem> items;
   private LocalDateTime transactionDate;
-  private boolean voided;
+  private String status; //changed from boolean
+  //added: for payment details
   private double totalAmount;
-
+  private double amountPaid;
+  private double change;
+  
   //CONSTRUCTOR
-  public Transaction (String clerkUsername, ArrayList<TransactionItem> items) {
-    this.clerkUsername = clerkUsername;
-    this.items = new ArrayList<TransactionItem>(items);
-    this.transactionId = UUID.randomUUID().toString();
-    this.transactionDate = LocalDateTime.now();
-    this.voided = false;
-    calculateTotal();
+  public Transaction (String clerkUsername) {
+	  this.clerkUsername = clerkUsername;
+	  this.items = new ArrayList<>();
+	  this.transactionId = UUID.randomUUID().toString();
+	  this.transactionDate = LocalDateTime.now();
+	  //added for payment
+	  this.status = PENDING;
+	  this.totalAmount = 0.0;
+	  this.amountPaid = 0.0;
+	  this.change = 0.0;
   }
+  
   //METHODS
-  //to calculate the total amount of items purchased
-  private void calculateTotal() {
-    totalAmount = 0; //initially 0
-    for (TransactionItem item: items) {
-      totalAmount += item.getSubtotal();
-    }
-  }
   //returns he transaction ID
   public String getTransactionId() {
-    return this.transactionId;
+	  return this.transactionId;
   }
   //returns the username of the Clerk
   public String getClerkUsername() {
-    return this.clerkUsername;
+	  return this.clerkUsername;
   }
   //returns date and time of transaction
   public LocalDateTime getTransactionDate() {
-    return this.transactionDate;
+	  return this.transactionDate;
   }
   //returns the total amount for/of the transaction
   public double getTotalAmount() {
-    return this.totalAmount;
+	  return this.totalAmount;
   }
-  //checker if transaction is voided
+  //added: returns the copy of transaction items
+  public ArrayList<TransactionItem> getItems() {
+	  return new ArrayList<>(items);
+  }
+  //added: getting the amount paid by customer
+  public double getAmountPaid() {
+	  return this.amountPaid;
+  }
+  //added: get customer's change
+  public double getChange() {
+	  return this.change;
+  }
+  //added: get status
+  public String getStatus() {
+	  return this.status;
+  }
+  //added: checker if transaction is Pending
+  public boolean isPending() {
+	  return status.equals(PENDING);
+  }
+  //added: checker if transaction is voided
   public boolean isVoided() {
-    return this.voided;
+	  return status.equals(VOIDED);
   }
-  // //to return the purchased items
-  // public ArrayList<TransactionItem> getItems() {
-  //   return new ArrayList<TransactionItem>(items);
-  // } 
 
   ///////////
 
   // methods: createTransaction
   // initializes a new transaction cart with a unique transaction id, 
   // the logged-in clerk's username, an empty arraylist of transaction items,
-  // and a pending status
+  // and a pending status -- I think nagawa na itu sa constructor? or di bah?
   
   // methods: addItem
   // adds a selected product and its quantity to the cart as a transaction item
   // (or increases the quantity if the product ID already exists in the cart)
-  
+  public void addItem(Product product, int quantity) {
+	  if (!isPending()) { //if status of transaction is not pending
+		  throw new IllegalStateException("Transaction is no longer pending.");
+	  }
+	  if (product == null) { //invalid/no product selected
+		  throw new IllegalArgumentException("Please select a product.");
+	  }
+	  if (quantity <= 0) { //invalid quantity
+		  throw new IllegalArgumentException("Quantity must be greater than 0.");
+	  }
+   	  for (TransactionItem item : items) {
+   		  if (item.getProduct().getProductId().equals(product.getProductId())) {
+   			  item.setQuantity(item.getQuantity() + quantity);
+   			  recalculateTotal();
+   			  return;
+   		  }
+   	  }
+    TransactionItem newItem = new TransactionItem(product, quantity);
+    items.add(newItem);
+    recalculateTotal();
+   }
   // methods: updateItemQuantity
   // changes the quantity of a specific item in the pending cart
-  
+  public void updateItemQuantity(String productId, int newQuantity) {
+      if (!isPending()) { //check if transaction is not pending 
+          throw new IllegalStateException("Transaction is no longer pending.");
+      }
+      if (productId == null || productId.trim().isEmpty()) { //check for invalid/empty productId
+          throw new IllegalArgumentException("Please enter a product ID.");
+      }
+      if (newQuantity <= 0) { //quantity must be valid (above 0)
+          throw new IllegalArgumentException("Quantity must be greater than 0.");
+      }
+      for (TransactionItem item : items) {
+          if (item.getProduct().getProductId().equals(productId)) {
+              item.setQuantity(newQuantity);
+              recalculateTotal();
+              return;
+          }
+      }
+      throw new IllegalArgumentException("Product was not found in the cart.");
+  }
   // methods: removeItem
   // removes an item from the cart
-  
+  public void removeItem(String productId) {
+      if (!isPending()) { //check if transaction is not pending 
+          throw new IllegalStateException("Transaction is no longer pending.");
+      }
+      if (productId == null || productId.trim().isEmpty()) { //check for invalid/empty productId
+          throw new IllegalArgumentException("Please enter a product ID.");
+      }
+      for (int i = 0; i < items.size(); i++) {
+          if (items.get(i).getProduct().getProductId().equals(productId)) {
+              items.remove(i);
+              recalculateTotal();
+              return;
+          }
+      }
+      throw new IllegalArgumentException("Product was not found in the cart.");
+  }
   // methods: recalculateTotal
   // recalculates the overall transaction amount using 
   // the subtotals of all transaction items
-  
+  public void recalculateTotal() {
+      totalAmount = 0.0;
+      for (TransactionItem item : items) {
+          totalAmount += item.calculateSubtotal();
+      }
+  }
   // methods: proceedCheckout
   // validates that the cart is not empty, payment is sufficient, 
   // and the transaction is pending before passing it for processing
@@ -89,4 +167,6 @@ public class Transaction implements Serializable {
   // methods: voidTransaction
   // updates the transaction status to voided
   // and triggers a corresponding refund to the cash wallet
+  
+
 }
