@@ -2,7 +2,6 @@ package honeyyard;
 
 import java.io.Serializable;
 
-
 public class TransactionItem implements Serializable {
   private static final long serialVersionUID = 1L;
   //ATTRIBUTES
@@ -29,20 +28,19 @@ public class TransactionItem implements Serializable {
   public double getUnitPrice() {
     return this.unitPrice;
   }
-  //this calculates the subtotal for the item in the transaction
-  public double getSubtotal() {
-    return quantity*unitPrice;
-  }
 
   /////////
-  //method for batch deductions? like quantity deducted from a batch? need kaya separate class?
-
   // method: getTransactionItemDetails
   // holds and retrieves the product, purchased quantity, 
   // and selling price at the time of purchase
-  
-  // methods: calculateSubtotal
+  public String getTransactionItemDetails() {
+	  return "Product: " + product.getName() + "\nQuantity: " + quantity + "\nUnit Price: PHP " + String.format("%.2f", unitPrice);  
+  }
+  // methods: calculateSubtotal 
   // computes the subtotal amount for the transaction item 
   // based on quantity and selling price
-  
+  public double calculateSubtotal() {
+	    return quantity*unitPrice;
+  }
+  // need ba natin ng toString method here? for the subtotal?
 }
