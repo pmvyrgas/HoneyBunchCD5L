@@ -27,8 +27,9 @@ public class Clerk extends User {
 		return pin.equals(enteredPin);
 	}
 
-    public Transaction startNewTransaction(ArrayList<TransactionItem> items){
-    Transaction newTransaction = new Transaction(this.getUsername(), items); //instatiates new transaction
+	// pam note: inalis ko ung parameter bc yung tansactions is like cart, so empty car sya sa start, also sa pagconstruct ng transaction, username lang parameter non sa constructor so di valid lagyan ng iba p
+    public Transaction startNewTransaction(){
+    Transaction newTransaction = new Transaction(this.getUsername()); //instatiates new transaction
 	return newTransaction;
   }
 
