@@ -37,34 +37,31 @@ public class Clerk extends User {
 
 // methods: processCheckout
 // enters the received payment amount to complete the checkout process
-    public boolean processCheckout(Transaction transaction, double amountPaid, Inventory inventory, TransactionRecords records, CashWallet wallet) {
-    	if (!"PENDING".equals(transaction.getStatus())) {
-            System.out.println("Transaction is not pending.");
-            return false;
+// added throws an exception with the reason 
+    public void processCheckout(Transaction transaction, double amountPaid, Inventory inventory, TransactionRecords records, CashWallet wallet) {
+    	if (transaction == null || inventory == null || records == null || wallet == null) {
+			throw new IllegalArgumentException("Missing transaction, inventory, records, or wallet.");
         }
 
-        if (transaction.getItems().isEmpty()) {
-            System.out.println("Cart is empty.");
-            return false;
-        }
+		
+		// pending, not empty, payment is enough, reuse from transaction
+		transaction.proceedCheckout(amountPaid);
+		
+		// check ALL items first before deducting anything
+		// so if one item is short, nothing has been deducted yet (no partial checkout), nilagyan ko na even if goal natin is one user at a time 
+		for (TransactionItem item : transaction.getItems()) {
+			int available = inventory.getTotalStock(item.getProduct().getProductId());
+			if (item.getQuantity() > available) {
+   		  		throw new IllegalArgumentException("Not enough stock. Only " + available +  "left in stock.");
+			}
+		}
 
-        if (amountPaid < transaction.getTotalAmount()) {
-            System.out.println("Insufficient payment amount.");
-            return false;
-        }
-
-        double change = amountPaid - transaction.getTotalAmount();
-
-        // Perform stock deduction for each item
-        try {
-            for (TransactionItem item : transaction.getItems()) {
-                inventory.deductStock(item.getProduct().getProductId(), item.getQuantity());
-            }
-        } catch (Exception e) {
-            System.out.println("Checkout failed due to stock deduction error: " + e.getMessage());
-            return false;
-        }
-
+		// perform stock deduction for each item (inventory alr handles where to deduct, yung isufficent payment handled by proceed checkout)
+		for (TransactionItem item : transaction.getItems()) {
+			inventory.deductStock(item.getProduct().getProductId(), item.getQuantity());
+		}
+	
+// PAM BALIKAN
         transaction.setStatus("COMPLETED");
         transaction.setAmountPaid(amountPaid);
         transaction.setChange(change);
@@ -78,4 +75,20 @@ public class Clerk extends User {
 	
 // methods: authorizeVoid
 // authorizes the voiding of a previously recorded transactio
+// methods: authorizeVoid
+// authorizes the voiding of a previously recorded transaction
+	public void authorizeVoid(String enteredPin, String transactionId, TransactionRecords records, CashWallet wallet) {
+		if (!isAuthorized(enteredPin)) {
+			throw new SecurityException("Wrong PIN. Cannot void the transaction.");
+		}
+		if (records == null) {
+			throw new IllegalArgumentException("Transaction records are not available.");
+		}
+		Transaction transaction = records.findTransactionById(transactionId);
+		if (transaction == null) {
+			throw new IllegalArgumentException("Transaction was not found.");
+		}
+		if (wallet == null) {
+			throw new IllegalArgumentException("Wallet is not available.");
+//BALIKAN
 }
