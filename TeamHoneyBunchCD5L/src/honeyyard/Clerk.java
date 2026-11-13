@@ -43,7 +43,6 @@ public class Clerk extends User {
 			throw new IllegalArgumentException("Missing transaction, inventory, records, or wallet.");
         }
 
-		
 		// pending, not empty, payment is enough, reuse from transaction
 		transaction.proceedCheckout(amountPaid);
 		
@@ -60,35 +59,45 @@ public class Clerk extends User {
 		for (TransactionItem item : transaction.getItems()) {
 			inventory.deductStock(item.getProduct().getProductId(), item.getQuantity());
 		}
-	
-// PAM BALIKAN
-        transaction.setStatus("COMPLETED");
-        transaction.setAmountPaid(amountPaid);
-        transaction.setChange(change);
 
-        records.getRecords().add(transaction);
-        wallet.recordSale(transaction.getTotalAmount(), transaction.getTransactionId());
-
-        System.out.println("Checkout successful! Change: " + change);
-        return true;
+		// finalize payment, add to history, and record sale
+        transaction.markCompleted(amountPaid);
+		records.addTransactionRecord(transaction);
+		wallet.recordSale(transaction);
+		
+      // save everything
+		inventory.saveData();
+		records.saveData();
+		wallet.saveData();
     }
 	
-// methods: authorizeVoid
-// authorizes the voiding of a previously recorded transactio
-// methods: authorizeVoid
+// methods: authorizevoid
 // authorizes the voiding of a previously recorded transaction
 	public void authorizeVoid(String enteredPin, String transactionId, TransactionRecords records, CashWallet wallet) {
-		if (!isAuthorized(enteredPin)) {
-			throw new SecurityException("Wrong PIN. Cannot void the transaction.");
+		if(!isAuthorized(enteredPin)){
+			throw new SecurityException("Invalid PIN. Cannot void the transaction.");
 		}
-		if (records == null) {
+		if(records == null) {
 			throw new IllegalArgumentException("Transaction records are not available.");
 		}
+
+		// reuse method from transaction records
 		Transaction transaction = records.findTransactionById(transactionId);
-		if (transaction == null) {
+		if(transaction == null) {
 			throw new IllegalArgumentException("Transaction was not found.");
 		}
 		if (wallet == null) {
 			throw new IllegalArgumentException("Wallet is not available.");
-//BALIKAN
+		}
+		// must be completed and not yet voided
+		transaction.checkCanBeVoided();
+		// refund first, so a failed refund doesn't leave it voided
+		wallet.recordRefund(transaction);
+		// then change the status
+		transaction.voidTransaction();
+
+		// save data
+		records.saveData();
+		wallet.saveData();
+	}
 }
