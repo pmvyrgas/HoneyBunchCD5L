@@ -1,56 +1,57 @@
 package honeyyard;
 
-import java.util.Date;
+import java.io.Serializable;
+// ito ginamit sa transaction, need consistent
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-public class CashEntry {
+public class CashEntry implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private double amount;
-    private String transactionReference;
+    private String entryId; // unique id of this entry
+	private String referenceId;  
     private String type;
-    private Date date;
+	private LocalDateTime dateTime;
 
-    public CashEntry(double amount, String transactionReference, String type, Date date) {
-        this.amount = amount;
-        this.transactionReference = transactionReference;
-        this.type = type;
-        this.date = date;
-    }
+    // nilipat ko here ung validations
+    public CashEntry(double amount, String transactionReference, String type, Date date){
+    	if (type == null || type.trim().isEmpty()) {
+			throw new IllegalArgumentException("Cash entry type is required.");
+		}
+		if (amount <= 0){
+			throw new IllegalArgumentException("Cash entry amount must be greater than 0.");
+		}
 
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public String getTransactionReference() {
-        return transactionReference;
-    }
-
-    public void setTransactionReference(String transactionReference) {
-        this.transactionReference = transactionReference;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+		this.entryId = UUID.randomUUID().toString();
+		this.referenceId = referenceId;
+		this.type = type;
+		this.amount = amount;
+		this.dateTime = LocalDateTime.now();
     }
     
-    // methods: createCashEntry
-    // generates individual records for cash movements 
-    // including amount, transaction reference, type, and date
-    public static CashEntry createCashEntry(double amount, String transactionReference, String type) {
-        return new CashEntry(amount, transactionReference, type, new Date());
-    }
+	public String getEntryId() {
+		return entryId;
+	}
+
+	public String getReferenceId() {
+		return referenceId;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public double getAmount() {
+		return amount;
+	}
+
+	public LocalDateTime getDateTime() {
+		return dateTime;
+	}
+    
+	@Override
+	public String toString(){
+		return type + " | " + String.format("%.2f", amount) + " | ref: " + referenceId+ " | " + dateTime;
+	}    
 }
