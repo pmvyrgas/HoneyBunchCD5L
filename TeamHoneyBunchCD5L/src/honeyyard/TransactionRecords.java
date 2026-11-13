@@ -70,6 +70,13 @@ public class TransactionRecords implements Serializable {
         }
         return null;
     }
-    // methods: addTransactionRecord
-    // adds a completed transaction to the system's arraylist of records
+    
+    // method: save data
+    public void saveData(){
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))){
+            out.writeObject(records);
+        }catch (IOException e) {
+            System.out.println("Cannot save the transactions file: " + fileName);
+        }
+    }
 }
