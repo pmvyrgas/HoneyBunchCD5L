@@ -99,7 +99,7 @@ public class Transaction implements Serializable {
   // adds a selected product and its quantity to the cart as a transaction item
   // (or increases the quantity if the product ID already exists in the cart)
 // checks stock from inventory but does not deduct it (deduction only happens at checkout)
-  public void addItem(Product product, int quantity) {
+  public void addItem(Product product, int quantity, Inventory inventory) {
 	  if (!isPending()) { //if status of transaction is not pending
 		  throw new IllegalStateException("Transaction is no longer pending.");
 	  }
@@ -114,7 +114,7 @@ public class Transaction implements Serializable {
    	  for (TransactionItem item : items) {
    		  if(item.getProduct().getProductId().equals(product.getProductId())) {
    			  if (item.getQuantity() + quantity > available) { //includes what's already in the cart
-   				  throw new IllegalArgumentException("Not enough stock. Only " + available + "left in stock.";
+   				  throw new IllegalArgumentException("Not enough stock. Only " + available + " left in stock.");
    			  }
    			  item.setQuantity(item.getQuantity() + quantity);
    			  recalculateTotal();
@@ -123,7 +123,7 @@ public class Transaction implements Serializable {
    	  }
 	  
    	  if (quantity > available) {
-   		  throw new IllegalArgumentException("Not enough stock. Only " + available +  "left in stock.");
+   		  throw new IllegalArgumentException("Not enough stock. Only " + available +  " left in stock.");
    	  }
 	  
     TransactionItem newItem = new TransactionItem(product, quantity);
@@ -133,7 +133,7 @@ public class Transaction implements Serializable {
 
   // methods: updateItemQuantity
   // changes the quantity of a specific item in the pending cart
-  public void updateItemQuantity(String productId, int newQuantity) {
+  public void updateItemQuantity(String productId, int newQuantity, Inventory inventory) {
       if (!isPending()) { //check if transaction is not pending 
           throw new IllegalStateException("Transaction is no longer pending.");
       }
@@ -146,7 +146,7 @@ public class Transaction implements Serializable {
       int available = inventory.getTotalStock(productId); //added stock check
 	  
       if (newQuantity > available) {
-   		  throw new IllegalArgumentException("Not enough stock. Only " + available +  "left in stock.");
+   		  throw new IllegalArgumentException("Not enough stock. Only " + available +  " left in stock.");
       }
       for (TransactionItem item : items) {
           if (item.getProduct().getProductId().equals(productId)) {
@@ -191,8 +191,8 @@ public class Transaction implements Serializable {
 		if(!isPending()){
 			throw new IllegalStateException("Only pending transactions can proceed to checkout! ");
 		} if(items.isEmpty()){
-			thrown new IllegalStateException("Cannot checkout with an empty cart");
-		} if(Double.isNaN(paymentAmount) || payment < this.totalAmount){
+			throw new IllegalStateException("Cannot checkout with an empty cart");
+		} if(Double.isNaN(paymentAmount) || paymentAmount < this.totalAmount){
 			throw new IllegalStateException("Insufficient payment amount, cannot proceed to checkout");
 			//added isnan check so non number payments are also rejected
 		}
@@ -202,7 +202,7 @@ public class Transaction implements Serializable {
   // marks the transaction as completed, finalizes the paid amount and change, 
   // and logs it to transaction records and the cash wallet
 	// will move adding to records and wallet to cerk
-	public void markCompleted(double paymentAmount, TransactionRecords records, CashWallet wallet){
+	public void markCompleted(double paymentAmount){
 		proceedCheckout(paymentAmount); //runs for the checkout validation first
 
 		this.amountPaid = paymentAmount;
