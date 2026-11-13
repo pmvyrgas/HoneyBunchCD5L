@@ -51,7 +51,7 @@ public class Clerk extends User {
 		for (TransactionItem item : transaction.getItems()) {
 			int available = inventory.getTotalStock(item.getProduct().getProductId());
 			if (item.getQuantity() > available) {
-   		  		throw new IllegalArgumentException("Not enough stock. Only " + available +  "left in stock.");
+   		  		throw new IllegalArgumentException("Not enough stock for " + item.getProduct().getName() + ". Only " + available + " left in stock.");
 			}
 		}
 
