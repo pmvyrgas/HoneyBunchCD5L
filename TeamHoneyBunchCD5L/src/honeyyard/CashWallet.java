@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.UncheckedIOException;
 
 public class CashWallet implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -31,14 +32,6 @@ public class CashWallet implements Serializable {
 		return new ArrayList<CashEntry>(cashEntries);
 	}
     
-    public void setBalance(double balance) { 
-        this.balance = balance; 
-    }
-    
-    public ArrayList<CashEntry> getCashEntries() { 
-        return cashEntries; 
-    }
-
     /* method: has entry (for other methods)
 	 * checks if there's already an entry of this type for this transaction
 	 * blocks duplicate sales and duplicate refunds
@@ -54,7 +47,7 @@ public class CashWallet implements Serializable {
 
     // methods: recordSale
     // record a completed purchase and updates the cash balance
-    public void recordSale(double amount, String transactionReference) {
+    public void recordSale(Transaction transaction) {
         if (transaction == null){
 			throw new IllegalArgumentException("No transaction was given.");
 		}
@@ -66,14 +59,14 @@ public class CashWallet implements Serializable {
 		}
 
 		double amount = transaction.getTotalAmount();
-		cashEntries.add(new CashEntry(transaction.getTransactionId(), "SALE", amount, null));
+		cashEntries.add(new CashEntry(amount, transaction.getTransactionId(), "SALE"));
 		balance += amount;
     }
     
     //methods: recordRefund 
     // handles and records refunds resulting from voided transactions
     // original sale entry stays, a separate refund entry is added
-    public void recordRefund(double amount, String transactionReference) {
+    public void recordRefund(Transaction transaction) {
 		if(transaction == null) {
 			throw new IllegalArgumentException("No transaction was given.");
 		}
@@ -91,7 +84,7 @@ public class CashWallet implements Serializable {
 			throw new IllegalStateException("Not enough cash in the wallet for this refund.");
 		}
 
-		cashEntries.add(new CashEntry(id, "REFUND", amount));
+		cashEntries.add(new CashEntry(amount, id, "REFUND"));
 		balance -= amount;
     }
 
@@ -112,7 +105,7 @@ public class CashWallet implements Serializable {
 			out.writeDouble(balance);
 			out.writeObject(cashEntries);
 		} catch (IOException e) {
-			System.out.println("Cannot save the wallet file: " + fileName);
+			throw new UncheckedIOException("Cannot save the wallet file: " + fileName, e);
 		}
 	}
 
@@ -130,9 +123,9 @@ public class CashWallet implements Serializable {
 			balance = in.readDouble(); // read in the same order they were saved
 			cashEntries = (ArrayList<CashEntry>) in.readObject();
 		}catch (IOException e) {
-			System.out.println("Cannot read the wallet file: " + fileName);
+			throw new UncheckedIOException("Cannot read the wallet file: " + fileName, e);
 		}catch (ClassNotFoundException e) {
-			System.out.println("Cannot load the saved wallet data.");
+			throw new IllegalStateException("Cannot load the saved wallet data.", e);
 		}
 	}
 
