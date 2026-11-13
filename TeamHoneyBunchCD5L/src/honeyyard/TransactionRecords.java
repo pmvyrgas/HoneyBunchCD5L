@@ -1,16 +1,27 @@
 package honeyyard;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TransactionRecords {
+public class TransactionRecords implements Serializable {
+    private static final long serialVersionUID = 1L;
     private ArrayList<Transaction> records;
-
+    private String fileName;
+    
     public TransactionRecords() {
         this.records = new ArrayList<>();
+        this.fileName = "transactions.txt";
     }
 
+    // returns only a copy, records can only be added through add transaction record
     public ArrayList<Transaction> getRecords() {
-      return records; 
+      return new ArrayList<>(records);
     }
 
     /////////// 
