@@ -77,27 +77,28 @@ public class Transaction implements Serializable {
 	  return status.equals(VOIDED);
   }
 
-  public void setStatus (String status) { 
-      this.status = status; 
-  }
-  
-  public void setAmountPaid(double amountPaid) { 
-      this.amountPaid = amountPaid; 
-  }
+	// inalis ko set status set amount paid and setchanges kasi status and payment shld only be thru mark completed and void transaction para may secure validations
+//  public void setStatus (String status) { 
+      //this.status = status; 
+//  
+ // public void setAmountPaid(double amountPaid) { 
+    //  this.amountPaid = amountPaid; 
+ // }
 
-  public void setChange(double change) { 
-      this.change = change; 
-  }
+//  public void setChange(double change) { 
+      //this.change = change; 
+//  }
   ///////////
 
   // methods: createTransaction
   // initializes a new transaction cart with a unique transaction id, 
   // the logged-in clerk's username, an empty arraylist of transaction items,
-  // and a pending status -- I think nagawa na itu sa constructor? or di bah?
+  // and a pending status -- I think nagawa na itu sa constructor? or di bah? yes done na, clerk calls it sa start new constructor
   
   // methods: addItem
   // adds a selected product and its quantity to the cart as a transaction item
   // (or increases the quantity if the product ID already exists in the cart)
+// checks stock from inventory but does not deduct it (deduction only happens at checkout)
   public void addItem(Product product, int quantity) {
 	  if (!isPending()) { //if status of transaction is not pending
 		  throw new IllegalStateException("Transaction is no longer pending.");
