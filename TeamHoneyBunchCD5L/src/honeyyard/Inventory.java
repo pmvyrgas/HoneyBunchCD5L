@@ -449,7 +449,7 @@ public class Inventory {
 	        out.writeObject(batches); // saves all batches
 
 	    }catch (IOException e) {
-   			 throw new UncheckedIOException("Cannot save the transactions file " + fileName, e); // throws so the gui can show it
+   			 throw new UncheckedIOException("Cannot save the inventory file " + fileName, e); // throws so the gui can show it
 		}
 	}
 
