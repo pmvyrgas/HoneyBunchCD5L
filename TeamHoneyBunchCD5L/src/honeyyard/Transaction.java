@@ -159,14 +159,48 @@ public class Transaction implements Serializable {
   // methods: proceedCheckout
   // validates that the cart is not empty, payment is sufficient, 
   // and the transaction is pending before passing it for processing
+	public void proceedCheckout(double paymentAmount){
+		if(!isPending()){
+			throw new IllegalStateException("Only pending transactions can proceed to checkout! ");
+		} if(items.isEmpty()){
+			thrown new IllegalStateException("Cannot checkout with an empty cart");
+		} if(payment < this.totalAmount){
+			throw new IllegalStateException("Insufficient payment amount, cannot proceed to checkout");
+		}
+	}
   
   // methods: markCompleted
   // marks the transaction as completed, finalizes the paid amount and change, 
   // and logs it to transaction records and the cash wallet
+	public void markCompleted(double paymentAmount, TransactionRecords records, CashWallet wallet){
+		proceedCheckout(paymentAmount); //runs for the checkout validation first
+
+		this.amountPaid = paymentAmount;
+		this.change = paymentAmount - this.totalAmount;
+		this.status = COMPLETED;   //changes status to completed
+		this.transactionDate = LocalDateTime.now();
+		
+		if(records != null){
+			records.addTransactionRecord(this);
+		}
+		if(wallet != null){
+			wallet.recordSale(this);
+		}
+	}
   
   // methods: voidTransaction
   // updates the transaction status to voided
   // and triggers a corresponding refund to the cash wallet
-  
+  public void voidTransaction(CashWallet wallet){
+  	if(isVoided()){
+		throw new IllegalStateException("Transactionn is already voided. ");
+	}
+	if (!status.equals(COMPLETED)) {
+        throw new IllegalStateException("Only completed transactions can be voided."); 
+    }
+	this.status = VOIDED; //change status to void
+	if(wallet != null){
+		wallet.recordRefund(this); //refund when voided
+  }
 
 }
