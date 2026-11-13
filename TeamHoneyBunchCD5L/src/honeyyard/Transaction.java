@@ -211,20 +211,23 @@ public class Transaction implements Serializable {
 		this.transactionDate = LocalDateTime.now();
 	}
 
-// BALIKAN PAM
-  // methods: voidTransaction
-  // updates the transaction status to voided
-  // and triggers a corresponding refund to the cash wallet
-  public void voidTransaction(CashWallet wallet){
-  	if(isVoided()){
+// hiniwalay ko yung check can be voided sa void transaction para mareuse in clerk when processing transactions
+  // methods: checkCanBeVoided
+  // checks if this transaction can be voided, used by clerk before recording the refund
+  public void checkCanBeVoided(){
+	if(isVoided()){
 		throw new IllegalStateException("Transaction is already voided. ");
 	}
-	if (!status.equals(COMPLETED)) {
-        throw new IllegalStateException("Only completed transactions can be voided."); 
-    }
+	if(!status.equals(COMPLETED)) {
+		throw new IllegalStateException("Only completed transactions can be voided.");
+	}
+  }
+
+  // method: voidTransaction
+  // updates the transaction status to voided
+  void voidTransaction(){
+	checkCanBeVoided();
 	this.status = VOIDED; //change status to void
-	if(wallet != null){
-		wallet.recordRefund(this); //refund when voided
   }
 
 }
