@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+// change the current systempprintln errors in file handling to use throw exception in prep for gui
+import java.io.UncheckedIOException;
 
 public class Inventory {
     private String fileName; // where the inventory is saved
@@ -446,9 +448,9 @@ public class Inventory {
 	        out.writeObject(products); // saves the whole product list
 	        out.writeObject(batches); // saves all batches
 
-	    }catch(IOException e){
-	        System.out.println("Cannot save the inventory file: " + fileName);
-	    }
+	    }catch (IOException e) {
+   			 throw new UncheckedIOException("Cannot save the transactions file " + fileName, e); // throws so the gui can show it
+		}
 	}
 
 	/* method: load data
@@ -466,11 +468,11 @@ public class Inventory {
 	        products = (ArrayList<Product>) in.readObject(); // read in the same order they were saved
 	        batches = (ArrayList<ProductBatch>) in.readObject();
 
-	    }catch(IOException e){
-	        System.out.println("Cannot read the inventory file: " + fileName);
-
-	    }catch(ClassNotFoundException e){
-	        System.out.println("Cannot load the saved inventory data.");
-	    }
+		}catch(IOException e){
+		    throw new UncheckedIOException("Cannot read the inventory file " + fileName, e); // throws so the gui can show it
+		
+		}catch(ClassNotFoundException e){
+		    throw new IllegalStateException("Cannot load the saved inventory data.", e);
+		}
 	}
 }
