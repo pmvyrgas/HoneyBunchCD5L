@@ -109,17 +109,28 @@ public class Transaction implements Serializable {
 	  if (quantity <= 0) { //invalid quantity
 		  throw new IllegalArgumentException("Quantity must be greater than 0.");
 	  }
+	  
+	   int available = inventory.getTotalStock(product.getProductId()); //added stock check
    	  for (TransactionItem item : items) {
-   		  if (item.getProduct().getProductId().equals(product.getProductId())) {
+   		  if(item.getProduct().getProductId().equals(product.getProductId())) {
+   			  if (item.getQuantity() + quantity > available) { //includes what's already in the cart
+   				  throw new IllegalArgumentException("Not enough stock. Only " + available + "left in stock.";
+   			  }
    			  item.setQuantity(item.getQuantity() + quantity);
    			  recalculateTotal();
    			  return;
    		  }
    	  }
+	  
+   	  if (quantity > available) {
+   		  throw new IllegalArgumentException("Not enough stock. Only " + available +  "left in stock.");
+   	  }
+	  
     TransactionItem newItem = new TransactionItem(product, quantity);
     items.add(newItem);
     recalculateTotal();
    }
+
   // methods: updateItemQuantity
   // changes the quantity of a specific item in the pending cart
   public void updateItemQuantity(String productId, int newQuantity) {
