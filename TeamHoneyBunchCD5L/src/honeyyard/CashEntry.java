@@ -14,8 +14,8 @@ public class CashEntry implements Serializable {
     private String type;
 	private LocalDateTime dateTime;
 
-    // nilipat ko here ung validations
-    public CashEntry(double amount, String transactionReference, String type, Date date){
+    // nilipat ko here ung validationsreferenceId
+    public CashEntry(double amount, String referenceId, String type){
     	if (type == null || type.trim().isEmpty()) {
 			throw new IllegalArgumentException("Cash entry type is required.");
 		}
