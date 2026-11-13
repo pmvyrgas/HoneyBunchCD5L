@@ -143,6 +143,11 @@ public class Transaction implements Serializable {
       if (newQuantity <= 0) { //quantity must be valid (above 0)
           throw new IllegalArgumentException("Quantity must be greater than 0.");
       }
+      int available = inventory.getTotalStock(productId); //added stock check
+	  
+      if (newQuantity > available) {
+   		  throw new IllegalArgumentException("Not enough stock. Only " + available +  "left in stock.");
+      }
       for (TransactionItem item : items) {
           if (item.getProduct().getProductId().equals(productId)) {
               item.setQuantity(newQuantity);
@@ -187,14 +192,16 @@ public class Transaction implements Serializable {
 			throw new IllegalStateException("Only pending transactions can proceed to checkout! ");
 		} if(items.isEmpty()){
 			thrown new IllegalStateException("Cannot checkout with an empty cart");
-		} if(payment < this.totalAmount){
+		} if(Double.isNaN(paymentAmount) || payment < this.totalAmount){
 			throw new IllegalStateException("Insufficient payment amount, cannot proceed to checkout");
+			//added isnan check so non number payments are also rejected
 		}
 	}
   
   // methods: markCompleted
   // marks the transaction as completed, finalizes the paid amount and change, 
   // and logs it to transaction records and the cash wallet
+	// will move adding to records and wallet to cerk
 	public void markCompleted(double paymentAmount, TransactionRecords records, CashWallet wallet){
 		proceedCheckout(paymentAmount); //runs for the checkout validation first
 
@@ -202,21 +209,15 @@ public class Transaction implements Serializable {
 		this.change = paymentAmount - this.totalAmount;
 		this.status = COMPLETED;   //changes status to completed
 		this.transactionDate = LocalDateTime.now();
-		
-		if(records != null){
-			records.addTransactionRecord(this);
-		}
-		if(wallet != null){
-			wallet.recordSale(this);
-		}
 	}
-  
+
+// BALIKAN PAM
   // methods: voidTransaction
   // updates the transaction status to voided
   // and triggers a corresponding refund to the cash wallet
   public void voidTransaction(CashWallet wallet){
   	if(isVoided()){
-		throw new IllegalStateException("Transactionn is already voided. ");
+		throw new IllegalStateException("Transaction is already voided. ");
 	}
 	if (!status.equals(COMPLETED)) {
         throw new IllegalStateException("Only completed transactions can be voided."); 
