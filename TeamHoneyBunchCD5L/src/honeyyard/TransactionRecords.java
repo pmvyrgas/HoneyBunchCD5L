@@ -75,8 +75,23 @@ public class TransactionRecords implements Serializable {
     public void saveData(){
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))){
             out.writeObject(records);
-        }catch (IOException e) {
-            System.out.println("Cannot save the transactions file: " + fileName);
-        }
+       } catch (IOException e) {
+         throw new UncheckedIOException("Cannot save the transactions file: " + fileName, e); // changed: throws so the gui can show it
+       }
     }
+
+    // method: load data, starts empty if there's no file yet
+    public void loadData(){
+    File file = new File(fileName);
+    if(!file.exists()){
+        return; // nothing saved yet (first run)
+    }
+    try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+        records = (ArrayList<Transaction>) in.readObject();
+    }catch (IOException e) {
+        throw new UncheckedIOException("Cannot read the transactions file " + fileName, e); // throws so the gui can show it
+    }catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Cannot load the saved transaction data.", e); //
+    }
+}
 }
