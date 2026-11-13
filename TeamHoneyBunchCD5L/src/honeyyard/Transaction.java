@@ -77,6 +77,17 @@ public class Transaction implements Serializable {
 	  return status.equals(VOIDED);
   }
 
+  public void setStatus (String status) { 
+      this.status = status; 
+  }
+  
+  public void setAmountPaid(double amountPaid) { 
+      this.amountPaid = amountPaid; 
+  }
+
+  public void setChange(double change) { 
+      this.change = change; 
+  }
   ///////////
 
   // methods: createTransaction
