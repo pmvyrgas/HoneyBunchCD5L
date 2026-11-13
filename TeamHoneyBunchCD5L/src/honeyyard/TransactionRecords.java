@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.io.UncheckedIOException;
 
 public class TransactionRecords implements Serializable {
     private static final long serialVersionUID = 1L;
